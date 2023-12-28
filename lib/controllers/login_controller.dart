@@ -1,4 +1,3 @@
-import 'dart:ffi';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_project/domain/models/user_data.dart';
@@ -20,10 +19,9 @@ class LoginController extends ChangeNotifier {
 
   Future<bool> singIn() async {
     inLoading.value = true;
-    print("login $_login senha $_pass");
     Future.delayed(const Duration(seconds: 2));
 
-    var result = await _userRepository.asyncLogin(UserData(1, _login, _pass, ""));
+    var result = await _userRepository.asyncLogin(_login, _pass);
     inLoading.value = false;
     return result;
   }

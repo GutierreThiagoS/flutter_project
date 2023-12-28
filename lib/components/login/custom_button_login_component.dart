@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_project/controllers/login_controller.dart';
 import 'package:flutter_project/main.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -14,7 +13,7 @@ class CustomButtonLoginComponent extends ConsumerWidget {
         builder: (_, inLoader, __) {
           return inLoader
               ? const CircularProgressIndicator()
-              : ElevatedButton(
+              : OutlinedButton(
                   onPressed: () {
                     ref.read(injectLoginController).singIn().then((result) {
                       if (result) {
@@ -23,7 +22,9 @@ class CustomButtonLoginComponent extends ConsumerWidget {
                         ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                                 content: Text("Falha ao realizar login"),
-                                duration: Duration(seconds: 5)));
+                                duration: Duration(seconds: 5)
+                            )
+                        );
                       }
                     });
                   },
@@ -37,6 +38,7 @@ class CustomButtonLoginComponent extends ConsumerWidget {
                       ),
                       SizedBox(
                         width: 10,
+                        height: 40,
                       ),
                       Icon(Icons.login)
                     ],

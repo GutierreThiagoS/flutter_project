@@ -85,7 +85,7 @@ class _$AppDatabase extends AppDatabase {
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `UserData` (`id` INTEGER NOT NULL, `login` TEXT NOT NULL, `password` TEXT NOT NULL, `date` TEXT NOT NULL, PRIMARY KEY (`id`))');
+            'CREATE TABLE IF NOT EXISTS `UserData` (`id` INTEGER NOT NULL, `login` TEXT NOT NULL, `password` TEXT NOT NULL, `date` TEXT NOT NULL, `expiration` TEXT NOT NULL, `accessToken` TEXT NOT NULL, `refreshToken` TEXT NOT NULL, PRIMARY KEY (`id`))');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -111,7 +111,10 @@ class _$UserDataDao extends UserDataDao {
                   'id': item.id,
                   'login': item.login,
                   'password': item.password,
-                  'date': item.date
+                  'date': item.date,
+                  'expiration': item.expiration,
+                  'accessToken': item.accessToken,
+                  'refreshToken': item.refreshToken
                 });
 
   final sqflite.DatabaseExecutor database;
@@ -129,7 +132,10 @@ class _$UserDataDao extends UserDataDao {
             row['id'] as int,
             row['login'] as String,
             row['password'] as String,
-            row['date'] as String));
+            row['date'] as String,
+            row['expiration'] as String,
+            row['accessToken'] as String,
+            row['refreshToken'] as String));
   }
 
   @override

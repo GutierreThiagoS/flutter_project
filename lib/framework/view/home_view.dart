@@ -11,7 +11,7 @@ class HomeView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
 
-    void _onItemTapped(int index) {
+    void onItemTapped(int index) {
       ref.read(injectHomeController).setSelectedIndex(index);
     }
 
@@ -129,7 +129,7 @@ class HomeView extends ConsumerWidget {
             ],
             currentIndex: i,
             selectedItemColor: Colors.amber[800],
-            onTap: _onItemTapped,
+            onTap: onItemTapped,
           );
         }
       ),

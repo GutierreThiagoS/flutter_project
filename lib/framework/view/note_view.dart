@@ -23,12 +23,14 @@ class _NoteViewState extends State<NoteView> {
   String text = "";
 
   Future<void> readTextFromImage(File image) async {
+    print("init readTextFromImage image $image");
     final inputImage = InputImage.fromFile(image);
+    print("2 readTextFromImage ");
     final textRecognizer = TextRecognizer();
-    final RecognizedText recognizedText =
-    await textRecognizer.processImage(inputImage);
+    final RecognizedText recognizedText = await textRecognizer.processImage(inputImage);
+    print("3 readTextFromImage recognizedText $recognizedText");
     text = recognizedText.text;
-    print("readTextFromImage");
+    print("end readTextFromImage");
     print(text);
   }
 
@@ -104,10 +106,9 @@ class _NoteViewState extends State<NoteView> {
     if (retrieveError != null) {
       return retrieveError;
     }
-    print("_previewImages $_mediaFileList");
+    print("_previewImages _mediaFileList $_mediaFileList");
 
     if (_mediaFileList != null) {
-
       return Semantics(
         label: 'image_picker_example_picked_images',
         child: ListView.builder(

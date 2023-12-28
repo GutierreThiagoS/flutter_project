@@ -4,7 +4,9 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_project/data/local/database.dart';
+import 'package:flutter_project/data/remote/response/response_info.dart';
 import 'package:flutter_project/data/remote/response/response_user_login.dart';
+import 'package:flutter_project/data/remote/state/state_info.dart';
 import 'package:flutter_project/domain/models/user_data.dart';
 import 'package:flutter_project/domain/repository/user_repository.dart';
 import 'package:flutter_project/utils/encryption_aes.dart';
@@ -62,38 +64,13 @@ class UserRepositoryImp implements UserRepository {
   }
 
   @override
-  Future<bool> asyncLogin(UserData user) async {
+  Future<bool> asyncLogin(String login, String password) async {
     try {
       final dio = Dio();
       dio.options.headers["content-type"] = "application/json";
-      /*final key = encrypt.Key.fromUtf8(JWT_LOGIN_SECRET);
-      final encrypter = encrypt.Encrypter(encrypt.AES(key));
-      final iv = encrypt.IV.fromLength(16);
-      var login = LoginRequest(user.login, user.login, "dag");
-      final encrypted = encrypter.encrypt(login.stringifier(), iv: iv);*/
-     /* var login = LoginRequest(user.login, user.password, "dag");
-
-      final key = encrypt.Key.fromSecureRandom(32);
-      final iv = encrypt.IV.fromSecureRandom(16);
-      final macValue = Uint8List.fromList(utf8.encode(JWT_LOGIN_SECRET));
-
-      final encrypter = encrypt.Encrypter(encrypt.AES(key, mode: encrypt.AESMode.sic));
-
-      final encrypted = encrypter.encrypt(
-        login.stringifier(),
-        iv: iv,
-        associatedData: macValue,
-      );
-
-      print("encrypted ${login.stringifier()}");
-      print("encrypted ${encrypted.base64.toString()}");
-      print("encrypted ${encrypted.base16.toString()}");*/
-
-      //"login": "U2FsdGVkX186wiakJ2ti+0ciHJfC2Aq20QS37946lg4ZXj+kIvtxfS1e48Sw13SPb+gekPLmx4TKIJ90ojFjZaW/3kRVGniFYgSrD5K63xI="
-
       var data = {
-        'userName': user.login,
-        'password': user.password,
+        'userName': login,
+        'password': password,
         'platform': "flutter",
       };
 
@@ -102,7 +79,7 @@ class UserRepositoryImp implements UserRepository {
       final response = await dio.post(
           'http://192.168.203.56:8081/auth/signincode',
           data: {
-            'login': crypto
+            'token': crypto
           },
           options: Options(
             contentType: Headers.jsonContentType,
@@ -114,23 +91,19 @@ class UserRepositoryImp implements UserRepository {
             }
           ),
       );
-
       print("response $response");
-
       ResponseUserLogin responseInfo = ResponseUserLogin.fromJson(response.data);
-
       print("loginResponse  $responseInfo");
-
       if(responseInfo.authenticated == true) {
         if (kIsWeb) {
           final prefs = await SharedPreferences.getInstance();
-          bool isLogin = await prefs.setString('user', user.login);
-          bool isPass = await prefs.setString('pass', user.password);
+          bool isLogin = await prefs.setString('user', login);
+          bool isPass = await prefs.setString('pass', password);
 
           return isLogin && isPass;
         } else {
           bool result = await insert(
-              UserData(1, user.login, user.password, "")
+              UserData(1, login, password, "", responseInfo.expiration!, responseInfo.accessToken!, responseInfo.refreshToken!)
           );
           return result;
         }
@@ -142,5 +115,46 @@ class UserRepositoryImp implements UserRepository {
       return false;
     }
   }
+
+  @override
+  Future<StateInfo> asyncRegisterUser(String fullName, String email, String userName, String password) async{
+    try {
+      final dio = Dio();
+      dio.options.headers["content-type"] = "application/json";
+
+      var data = {
+        'userName': userName,
+        'fullName': fullName,
+        'email': email,
+        'password': password,
+        'platform': "flutter",
+      };
+
+      var crypto = encrypt(jsonEncode(data));
+
+      final response = await dio.post(
+        'http://192.168.203.56:8081/auth/signuptoken',
+        data: {
+          'token': crypto
+        },
+        options: Options(
+            contentType: Headers.jsonContentType,
+            headers: {
+              Headers.acceptHeader: Headers.jsonContentType,
+              Headers.contentTypeHeader: Headers.jsonContentType,
+            }
+        ),
+      );
+      print("response ${response.data}");
+      ResponseInfo responseInfo = ResponseInfo.fromJson(response.data);
+      print("loginResponse  $responseInfo");
+      return StateInfo(responseInfo.status, responseInfo.info);
+    } catch(e) {
+      print("Error Dio $e");
+      return StateInfo(false, "Usuário não cadastrado!");
+    }
+  }
+
+
 
 }

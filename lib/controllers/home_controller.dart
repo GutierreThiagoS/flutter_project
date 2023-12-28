@@ -1,6 +1,5 @@
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter_project/domain/models/bottom_menu_bar.dart';
 import 'package:flutter_project/domain/models/coupon.dart';
 import 'package:flutter_project/domain/repository/user_repository.dart';
 import 'package:flutter_project/main.dart';
