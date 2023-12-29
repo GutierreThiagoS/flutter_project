@@ -86,7 +86,8 @@ class HomeView extends ConsumerWidget {
                                                 arguments: list[i]
                                             );
                                           },
-                                        ));
+                                        )
+                                    );
                                   },
                                 );
                         },
